@@ -1,92 +1,95 @@
-/* Basic styles only */
+* {
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
 
 body {
-  margin: 0;
-  padding: 16px;
-  background: #f5f5f5;
-  color: #222;
+  background: #f4f6f8;
+  padding: 30px;
 }
 
-.wrap {
-  max-width: 860px;
-  margin: 0 auto;
-}
-
-h1 {
-  font-size: 22px;
-  margin: 0 0 12px 0;
-}
-
-.panel {
+/* Section cards */
+section {
   background: #ffffff;
-  border: 1px solid #ddd;
-  padding: 12px;
-  border-radius: 6px;
-  margin-bottom: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
 }
 
-.row { margin-bottom: 10px; }
-
-label {
-  display: block;
-  font-weight: bold;
-  margin-bottom: 4px;
-}
-
-input[type="text"],
-input[type="search"],
-textarea {
-  width: 100%;
-  padding: 8px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.actions { display: flex; gap: 8px; }
-
+/* Buttons */
 button {
-  padding: 8px 12px;
-  border: 1px solid #bbb;
-  background: #eee;
-  border-radius: 4px;
+  padding: 8px 14px;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 6px;
+  background-color: #2563eb;
+  color: white;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+button:hover {
+  background-color: #1e40af;
+}
+
+button:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* Lists */
+ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+li {
+  padding: 8px;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 14px;
+}
+
+/* Input */
+input {
+  padding: 8px;
+  width: 200px;
+  margin-right: 10px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+}
+
+/* Switch button section */
+#switch_btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Pay button */
+#pay {
+  background-color: #16a34a;
+}
+
+#pay:hover {
+  background-color: #15803d;
+}
+
+/* Message button */
+#message {
+  background-color: #f97316;
+}
+
+#message:hover {
+  background-color: #ea580c;
+}
+
+.delegated-item {
+  padding: 8px;
   cursor: pointer;
 }
 
-button#submit-btn {
-  background: #0077cc;
-  color: #fff;
-  border-color: #0077cc;
+.delegated-item.active {
+  background: #dbeafe;
+  font-weight: bold;
 }
-
-.hidden { display: none; }
-
-.error {
-  color: #b00020;
-  font-size: 12px;
-  margin-top: 4px;
-}
-
-
-
-
-
-/* Card */
-.note {
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 10px;
-}
-
-.note h3 {
-  margin: 0 0 6px 0;
-  font-size: 16px;
-}
-
-.note p {
-  margin: 0 0 8px 0;
-  font-size: 14px;
-}
-
-.note .note-actions { display: flex; gap: 6px; }

@@ -1,0 +1,99 @@
+/* Reset & Base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+body {
+  background-color: #f4f6f8;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px;
+}
+
+/* Heading */
+h1 {
+  margin-bottom: 20px;
+  color: #1f2937;
+}
+
+/* Main container */
+main {
+  width: 100%;
+  max-width: 500px;
+}
+
+/* Search container */
+#search-container {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Input */
+#search-input {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  outline: none;
+}
+
+#search-input:focus {
+  border-color: #3b82f6;
+}
+
+/* Buttons */
+button {
+  padding: 8px 12px;
+  margin-right: 6px;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  background-color: #3b82f6;
+  color: white;
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  background-color: #2563eb;
+}
+
+/* Clear button style */
+button:last-of-type {
+  background-color: #ef4444;
+}
+
+button:last-of-type:hover {
+  background-color: #dc2626;
+}
+
+/* List */
+#item-list {
+  list-style: none;
+  margin-top: 15px;
+}
+
+/* List items */
+#item-list li {
+  padding: 10px;
+  margin-bottom: 8px;
+  background-color: #f9fafb;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+#item-list li:hover {
+  background-color: #e0f2fe;
+  transform: translateX(5px);
+}

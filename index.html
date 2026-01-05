@@ -1,51 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-        }
-        section {
-            margin: 10px;
-        }
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            border: none;
-            background-color: #007BFF;
-            color: white;
-            border-radius: 5px;
-        }
-        button a {
-            color: white;
-            text-decoration: none;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-    </style>
-    <title>Document</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hackathon Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
-    <section>
-        <button><a href="./student1/dashboard.html">section 1</a></button>
-    </section>
-    <section>
-        <button><a href="./student2/home.html">section 2</a></button>   
-    </section>
-    <section>
-        <button><a href="./student3/api.html">section 3</a></button>
-    </section>
-    
+  <div class="container">
+    <header class="header">
+      <div class="brand">
+        <div class="logo">TB</div>
+        <div>
+          <div class="title">TeraBytes — Hackathon Collection</div>
+          <div class="tagline">Student projects showcase</div>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <a href="#">Overview</a>
+        <a href="./student1/dashboard.html">Student 1</a>
+        <a href="./student2/home.html">Student 2</a>
+        <a href="./student3/api.html">Student 3</a>
+      </nav>
+    </header>
+
+    <main>
+      <div class="dashboard">
+        <div class="card">
+          <h3>Student 1</h3>
+          <p>User System & Dashboard</p>
+          <button class="btn" onclick="location.href='./student1/dashboard.html'">Open</button>
+        </div>
+
+        <div class="card">
+          <h3>Student 2</h3>
+          <p>Smart Search & Sorting</p>
+          <button class="btn" onclick="location.href='./student2/home.html'">Open</button>
+        </div>
+
+        <div class="card">
+          <h3>Student 3</h3>
+          <p>API, Async & Caching</p>
+          <button class="btn" onclick="location.href='./student3/api.html'">Open</button>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      Designed for the TeraBytes Hackathon — built with ❤️
+    </footer>
+  </div>
 </body>
 </html>

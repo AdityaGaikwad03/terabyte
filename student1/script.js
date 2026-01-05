@@ -1,198 +1,404 @@
+/*************************
+ * DOM CACHING
+ *************************/
+const loginSection = document.getElementById("loginSection");
+const registrationSection = document.getElementById("registrationSection");
+const appSection = document.getElementById("appSection");
+const adminApp = document.getElementById("adminApp");
+const userApp = document.getElementById("userApp");
+
+const loginForm = document.getElementById("loginForm");
+const registrationForm = document.getElementById("registrationForm");
+
+const loginError = document.getElementById("loginError");
+const regError = document.getElementById("regError");
+
+const profileCard = document.getElementById("profileCard");
+const noProfileMsg = document.getElementById("noProfileMsg");
+
+/*************************
+ * VIEW HELPERS
+ *************************/
 function showLogin() {
-  document.getElementById("loginSection").style.display = "block";
-  document.getElementById("registrationSection").style.display = "none";
+  loginSection.style.display = "block";
+  registrationSection.style.display = "none";
+  appSection.style.display = "none";
 }
 
 function showRegistration() {
-  document.getElementById("loginSection").style.display = "none";
-  document.getElementById("registrationSection").style.display = "block";
+  loginSection.style.display = "none";
+  registrationSection.style.display = "block";
 }
 
-let corrent_user = null;
-
-document
-  .getElementById("loginForm")
-  .addEventListener("submit", function (event) {
-    event.preventDefault();
-    const email = document.getElementById("loginEmail").value;
-    const password = document.getElementById("loginPassword").value;
-    let users = JSON.parse(localStorage.getItem("users_a")) || [];
-    const user = users.find(
-      (user) => user.email === email && user.password === password
-    );
-    if (user) {
-      corrent_user = user;
-      localStorage.setItem("loggedInUser", JSON.stringify(user));
-      // Add action log for login
-      if (typeof addActionLog === 'function') addActionLog('login', user.email);
-      document.getElementById("loginError").innerText = "Login successful!";
-      showApp(user.role);
-      displayUserData();
-    } else {
-      document.getElementById("loginError").innerText =
-        "Invalid email or password.";
-    }
-  });
-
-document
-  .getElementById("registrationForm")
-  .addEventListener("submit", function (event) {
-    event.preventDefault();
-    const name = document.getElementById("regName").value;
-    const email = document.getElementById("regEmail").value;
-    const password = document.getElementById("regPassword").value;
-    const role = document.querySelector('input[name="role"]:checked').value;
-
-    if (password.length < 6) {
-      document.getElementById("regError").innerText =
-        "Password must be at least 6 characters long.";
-      return;
-    }
-    let users = JSON.parse(localStorage.getItem("users_a")) || [];
-    const userExists = users.some((user) => user.email === email);
-    if (userExists) {
-      document.getElementById("regError").innerText =
-        "Email is already registered.";
-      return;
-    }
-    const newUser = { name, email, password, role };
-    users.push(newUser);
-    localStorage.setItem("users_a", JSON.stringify(users));
-    // Add action log for register
-    if (typeof addActionLog === 'function') addActionLog('register', email);
-    // Update admin users list if admin panel is visible
-    if (typeof renderRegisteredUsers === "function") renderRegisteredUsers();
-    document.getElementById("regError").innerText =
-      "Registration successful! You can now log in.";
-    showLogin();
-  });
-
-function logout() {
-  // record logout with current logged in email
-  const current = JSON.parse(localStorage.getItem('loggedInUser'));
-  if (current && typeof addActionLog === 'function') addActionLog('logout', current.email);
-  document.getElementById("appSection").style.display = "none";
-  document.getElementById("loginSection").style.display = "block";
-  localStorage.removeItem("loggedInUser");
-  corrent_user = null;
-  displayUserData();
-}
+document.getElementById("otpSection").style.display = "none";
 
 function showApp(role) {
-  document.getElementById("loginSection").style.display = "none";
-  if (role === "admin") {
-    document.getElementById("adminApp").style.display = "block";
-    document.getElementById("appSection").style.display = "block";
-    document.getElementById("userApp").style.display = "none";
-    if (typeof renderRegisteredUsers === "function") renderRegisteredUsers();
-    if (typeof renderActionLogs === "function") renderActionLogs();
+  loginSection.style.display = "none";
+  appSection.style.display = "block";
 
-  } else if (role === "user") {
-    document.getElementById("userApp").style.display = "block";
-    document.getElementById("adminApp").style.display = "none";
-    document.getElementById("appSection").style.display = "block";
-  } else {
-    document.getElementById("adminApp").style.display = "none";
-    document.getElementById("userApp").style.display = "none";
+  adminApp.style.display = role === "admin" ? "block" : "none";
+  userApp.style.display = role === "user" ? "block" : "none";
+
+  if (role === "admin") {
+    renderRegisteredUsers();
+    renderActionLogs();
   }
+
+  displayUserData();
+  sync2FAToggle();
+}
+
+/*************************
+ * AUTH: LOGIN
+ *************************/
+loginForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const email = document.getElementById("loginEmail").value;
+  const password = document.getElementById("loginPassword").value;
+
+  const users = JSON.parse(localStorage.getItem("users_a")) || [];
+  const user = users.find(
+    (u) => u.email === email && u.password === password
+  );
+
+  if (!user) {
+    loginError.innerText = "Invalid email or password";
+    return;
+  }
+
+  loginError.innerText = "";
+
+  if (user.is2FAEnabled) {
+    start2FA(user);
+    show2FAScreen();
+  } else {
+    localStorage.setItem("loggedInUser", JSON.stringify(user));
+    addActionLog("login", user.email);
+    document.getElementById("otpSection").style.display = "none";
+    showApp(user.role);
+  }
+});
+
+/*************************
+ * AUTH: REGISTRATION
+ *************************/
+registrationForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const name = document.getElementById("regName").value;
+  const email = document.getElementById("regEmail").value;
+  const password = document.getElementById("regPassword").value;
+  const role = document.querySelector('input[name="role"]:checked').value;
+
+  if (password.length < 6) {
+    regError.innerText = "Password must be at least 6 characters";
+    return;
+  }
+
+  let users = JSON.parse(localStorage.getItem("users_a")) || [];
+
+  if (users.some((u) => u.email === email)) {
+    regError.innerText = "Email already registered";
+    return;
+  }
+
+  const newUser = {
+    name,
+    email,
+    password,
+    role,
+    is2FAEnabled: false,
+    currentOTP: null,
+    otpExpiresAt: null
+  };
+
+  users.push(newUser);
+  localStorage.setItem("users_a", JSON.stringify(users));
+  addActionLog("register", email);
+
+  regError.innerText = "Registration successful. Please login.";
+  showLogin();
+});
+
+/*************************
+ * LOGOUT
+ *************************/
+function logout() {
+  const current = JSON.parse(localStorage.getItem("loggedInUser"));
+  if (current) addActionLog("logout", current.email);
+
+  if (otpTimer) clearInterval(otpTimer);
+  localStorage.removeItem("pending2FAUser");
+  localStorage.removeItem("loggedInUser");
+
+  showLogin();
   displayUserData();
 }
 
+/*************************
+ * PROFILE (READ-ONLY)
+ *************************/
+function displayUserData() {
+  const user = JSON.parse(localStorage.getItem("loggedInUser"));
+
+  if (!user) {
+    if (profileCard) profileCard.style.display = "none";
+    if (noProfileMsg) noProfileMsg.style.display = "block";
+    return;
+  }
+
+  if (profileCard) profileCard.style.display = "block";
+  if (noProfileMsg) noProfileMsg.style.display = "none";
+
+  document.getElementById("profileName").innerText = user.name;
+  document.getElementById("profileEmail").innerText = user.email;
+  document.getElementById("profileRole").innerText = user.role;
+}
+
+/*************************
+ * ADMIN: USERS LIST
+ *************************/
 function escapeHtml(text) {
-  if (!text) return "";
-  return String(text)
+  return String(text || "")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+    .replace(/>/g, "&gt;");
 }
 
 function renderRegisteredUsers() {
   const users = JSON.parse(localStorage.getItem("users_a")) || [];
-  // Filter to only show regular users (exclude admin registrations)
-  const usersOnly = users.filter(u => (u.role || '').toLowerCase() === 'user');
+  const usersOnly = users.filter(u => u.role === "user");
+
   const table = document.getElementById("usersTable");
   const tbody = document.getElementById("usersTableBody");
   const noMsg = document.getElementById("noUsersMsg");
-  if (!table || !tbody || !noMsg) return;
+
   if (usersOnly.length === 0) {
     table.style.display = "none";
     noMsg.style.display = "block";
-    tbody.innerHTML = "";
     return;
   }
-  noMsg.style.display = "none";
+
   table.style.display = "table";
-  tbody.innerHTML = usersOnly
-    .map(u => `\n
-        <tr>\n  
-            <td>${escapeHtml(u.name)}</td>\n  
-            <td>${escapeHtml(u.email)}</td>\n  
-            <td>${escapeHtml(u.role)}</td>\n
-        </tr>
-    `)
-    .join("");
+  noMsg.style.display = "none";
+
+  tbody.innerHTML = usersOnly.map(u => `
+    <tr>
+      <td>${escapeHtml(u.name)}</td>
+      <td>${escapeHtml(u.email)}</td>
+      <td>${escapeHtml(u.role)}</td>
+    </tr>
+  `).join("");
 }
 
-function displayUserData() {
-  const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
-  const profileCard = document.getElementById("profileCard");
-  const noProfileMsg = document.getElementById("noProfileMsg");
-  if (loggedInUser) {
-    if (profileCard) profileCard.style.display = "block";
-    if (noProfileMsg) noProfileMsg.style.display = "none";
-    document.getElementById("profileName").innerText = loggedInUser.name || "";
-    document.getElementById("profileEmail").innerText =
-      loggedInUser.email || "";
-    document.getElementById("profileRole").innerText = loggedInUser.role || "";
-  } else {
-    if (profileCard) profileCard.style.display = "none";
-    if (noProfileMsg) noProfileMsg.style.display = "block";
-    document.getElementById("profileName").innerText = "";
-    document.getElementById("profileEmail").innerText = "";
-    document.getElementById("profileRole").innerText = "";
-  }
-}
-
-window.onload = function () {
-  const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
-  if (loggedInUser) {
-    showApp(loggedInUser.role);
-    displayUserData();
-  } else {
-    showLogin();
-  }
-};
-
-// Action logs storage (used by admin)
-// key: action_logs (array of {type, email, timestamp})
+/*************************
+ * ACTION LOGS
+ *************************/
 function addActionLog(type, email) {
-  const logs = JSON.parse(localStorage.getItem('action_logs')) || [];
-  const entry = { type, email: email || '', timestamp: new Date().toISOString() };
-  logs.unshift(entry); // newest first
-  localStorage.setItem('action_logs', JSON.stringify(logs));
-  if (typeof renderActionLogs === 'function') renderActionLogs();
+  // Don't record logs for admin users
+  const users = JSON.parse(localStorage.getItem("users_a")) || [];
+  const user = users.find(u => u.email === email);
+  if (user && user.role === "admin") return;
+
+  const logs = JSON.parse(localStorage.getItem("action_logs")) || [];
+  logs.unshift({ type, email, timestamp: new Date().toISOString() });
+  localStorage.setItem("action_logs", JSON.stringify(logs));
 }
 
 function renderActionLogs() {
-  const logs = JSON.parse(localStorage.getItem('action_logs')) || [];
-  const table = document.getElementById('logsTable');
-  const tbody = document.getElementById('logsTableBody');
-  const noMsg = document.getElementById('noLogsMsg');
-  if (!table || !tbody || !noMsg) return;
+  const logs = JSON.parse(localStorage.getItem("action_logs")) || [];
+  const table = document.getElementById("logsTable");
+  const tbody = document.getElementById("logsTableBody");
+  const noMsg = document.getElementById("noLogsMsg");
+
   if (logs.length === 0) {
-    table.style.display = 'none';
-    noMsg.style.display = 'block';
-    tbody.innerHTML = '';
+    table.style.display = "none";
+    noMsg.style.display = "block";
     return;
   }
-  noMsg.style.display = 'none';
-  table.style.display = 'table';
-  tbody.innerHTML = logs.map(l => `\n
-    <tr>\n  
-        <td>${escapeHtml(l.type)}</td>\n
-        <td>${escapeHtml(l.email)}</td>\n  
-        <td>${escapeHtml(new Date(l.timestamp).toLocaleString())}</td>\n
-    </tr>`).join('');
+
+  table.style.display = "table";
+  noMsg.style.display = "none";
+
+  tbody.innerHTML = logs.map(l => `
+    <tr>
+      <td>${escapeHtml(l.type)}</td>
+      <td>${escapeHtml(l.email)}</td>
+      <td>${new Date(l.timestamp).toLocaleString()}</td>
+    </tr>
+  `).join("");
+}
+
+/*************************
+ * 2FA IMPLEMENTATION
+ *************************/
+let otpTimer = null;
+
+function generateOTP() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+function start2FA(user) {
+  user.currentOTP = generateOTP();
+  user.otpExpiresAt = Date.now() + 30000;
+  localStorage.setItem("pending2FAUser", JSON.stringify(user));
+
+  if (otpTimer) clearInterval(otpTimer);
+
+  updateOTPDisplay();
+  updateOTPProgress(); // 🔥 start immediately
+
+  otpTimer = setInterval(() => {
+    const pending = JSON.parse(localStorage.getItem("pending2FAUser"));
+    if (!pending) {
+      clearInterval(otpTimer);
+      otpTimer = null;
+      return;
+    }
+
+    if (Date.now() >= pending.otpExpiresAt) {
+      pending.currentOTP = generateOTP();
+      pending.otpExpiresAt = Date.now() + 30000;
+      localStorage.setItem("pending2FAUser", JSON.stringify(pending));
+      updateOTPDisplay();
+    }
+
+    updateOTPProgress();
+  }, 1000);
+}
+
+
+function show2FAScreen() {
+  if (loginSection) loginSection.style.display = "none";
+
+  const otpSection = document.getElementById("otpSection");
+  if (otpSection) otpSection.style.display = "block";
+
+  const otpInput = document.getElementById("otpInput");
+  if (otpInput) {
+    otpInput.value = "";
+    try { otpInput.focus(); } catch (e) {}
+  }
+
+  const otpError = document.getElementById("otpError");
+  if (otpError) otpError.innerText = "";
+
+  updateOTPDisplay();
+  updateOTPProgress();
+}
+
+function updateOTPDisplay() {
+  const user = JSON.parse(localStorage.getItem("pending2FAUser"));
+  const otpDisplay = document.getElementById("otpDisplay");
+
+  if (!otpDisplay) return;
+
+  if (user) {
+    otpDisplay.innerText = `Current Code: ${user.currentOTP}`;
+  } else {
+    otpDisplay.innerText = "";
+  }
+} 
+
+function verifyOTP() {
+  const entered = document.getElementById("otpInput").value;
+  const user = JSON.parse(localStorage.getItem("pending2FAUser"));
+
+  if (!user) {
+    showLogin();
+    return;
+  }
+
+  if (entered === user.currentOTP && Date.now() <= user.otpExpiresAt) {
+    clearInterval(otpTimer);
+    localStorage.removeItem("pending2FAUser");
+    localStorage.setItem("loggedInUser", JSON.stringify(user));
+    addActionLog("login", user.email);
+    document.getElementById("otpSection").style.display = "none";
+    showApp(user.role);
+  } else {
+    document.getElementById("otpError").innerText =
+      "Invalid or expired OTP";
+  }
+}
+
+/*************************
+ * AUTO LOGIN
+ *************************/
+window.onload = () => {
+  const user = JSON.parse(localStorage.getItem("loggedInUser"));
+  if (user) showApp(user.role);
+  else showLogin();
+};
+
+function sync2FAToggle() {
+  const user = JSON.parse(localStorage.getItem("loggedInUser"));
+  if (!user) return;
+
+  const toggle = document.getElementById("toggle2FA");
+  toggle.checked = !!user.is2FAEnabled;
+}
+
+document.getElementById("toggle2FA").addEventListener("change", (e) => {
+  const user = JSON.parse(localStorage.getItem("loggedInUser"));
+  if (!user) return;
+
+  if (e.target.checked) {
+    // ENABLE 2FA
+    user.is2FAEnabled = true;
+    updateUser(user);
+  } else {
+    // ASK PASSWORD TO DISABLE
+    document.getElementById("disable2FABox").style.display = "block";
+  }
+});
+
+function disable2FA() {
+  const user = JSON.parse(localStorage.getItem("loggedInUser"));
+  const enteredPassword = document.getElementById("confirmPassword").value;
+  const toggle = document.getElementById("toggle2FA");
+
+  if (enteredPassword !== user.password) {
+    document.getElementById("disable2FAError").innerText =
+      "Incorrect password";
+    toggle.checked = true; // 🔥 revert checkbox
+    return;
+  }
+
+  user.is2FAEnabled = false;
+  updateUser(user);
+
+  document.getElementById("disable2FABox").style.display = "none";
+  document.getElementById("confirmPassword").value = "";
+  document.getElementById("disable2FAError").innerText = "";
+}
+
+
+function updateUser(updatedUser) {
+  let users = JSON.parse(localStorage.getItem("users_a")) || [];
+  users = users.map(u => u.email === updatedUser.email ? updatedUser : u);
+
+  localStorage.setItem("users_a", JSON.stringify(users));
+  localStorage.setItem("loggedInUser", JSON.stringify(updatedUser));
+}
+
+function updateOTPProgress() {
+  const user = JSON.parse(localStorage.getItem("pending2FAUser"));
+  const progressEl = document.getElementById("otpProgress");
+  const timerTextEl = document.getElementById("otpTimerText");
+
+  if (!progressEl || !timerTextEl) return;
+
+  if (!user) {
+    progressEl.style.width = "0%";
+    timerTextEl.innerText = "";
+    return;
+  }
+
+  const remaining = Math.max(0, user.otpExpiresAt - Date.now());
+  const percent = (remaining / 30000) * 100;
+
+  progressEl.style.width = percent + "%";
+  timerTextEl.innerText = `Expires in ${Math.ceil(remaining / 1000)}s`;
 }

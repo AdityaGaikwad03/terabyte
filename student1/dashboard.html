@@ -3,17 +3,28 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../styles.css" />
     <link rel="stylesheet" href="style.css" />
-    <title>Document</title>
+    <title>Hackathon App</title>
   </head>
+
   <body>
     <div class="container">
-      <!-- login Section -->
+      <header class="page-header">
+        <a class="back-btn" href="../index.html">← Home</a>
+        <div style="flex:1"></div>
+      </header>
+      <!-- LOGIN -->
       <div id="loginSection">
         <form id="loginForm">
           <h2>Login</h2>
           <input type="email" id="loginEmail" placeholder="Email" required />
-          <input type="password" id="loginPassword" placeholder="Password" required/>
+          <input
+            type="password"
+            id="loginPassword"
+            placeholder="Password"
+            required
+          />
           <button class="btn" type="submit">Login</button>
           <div id="loginError"></div>
           <p class="text">
@@ -22,96 +33,140 @@
         </form>
       </div>
 
-      <!-- registration Section -->
+      <!-- REGISTER -->
       <div id="registrationSection">
         <form id="registrationForm">
           <h2>Register</h2>
           <input type="text" id="regName" placeholder="Name" required />
           <input type="email" id="regEmail" placeholder="Email" required />
-          <input type="password" id="regPassword" placeholder="Password" required/>
+          <input
+            type="password"
+            id="regPassword"
+            placeholder="Password"
+            required
+          />
+
           <div class="role">
-            <label for="roleUser">User</label>
-            <input type="radio" id="roleUser" name="role" value="user"checked
-            />
-            <label for="roleAdmin">Admin</label>
-            <input type="radio" id="roleAdmin" name="role" value="admin" />
+            <label>
+              <input type="radio" name="role" value="user" checked /> User
+            </label>
+            <label>
+              <input type="radio" name="role" value="admin" /> Admin
+            </label>
           </div>
 
           <button class="btn" type="submit">Register</button>
           <div id="regError"></div>
 
           <p class="text">
-            Allready registered?
+            Already registered?
             <a href="#" onclick="showLogin()">Login here</a>
           </p>
         </form>
       </div>
 
-      <!-- App Section -->
+      <!-- OTP (2FA) SECTION -->
+      <div id="otpSection" style="display: none">
+        <h2>2FA Verification</h2>
+        <p id="otpDisplay"></p>
+
+        <input
+          type="text"
+          id="otpInput"
+          placeholder="Enter 6-digit OTP"
+          maxlength="6"
+        />
+
+        <button class="btn" onclick="verifyOTP()">Verify</button>
+        <div id="otpError" style="color: red; margin-top: 8px"></div>
+        <div class="progress-container">
+          <div id="otpProgress"></div>
+        </div>
+        <p id="otpTimerText" style="font-size: 14px; color: #555"></p>
+      </div>
+
+      <!-- APP -->
       <div id="appSection" style="display: none">
-        <!-- admin app -->
+        <!-- ADMIN -->
         <div id="adminApp" style="display: none">
           <nav>
-            <button class="btn" id="logoutBtn" onclick="logout()">
-              Logout
-            </button>
+            <button class="btn logoutBtn" onclick="logout()">Logout</button>
           </nav>
+
           <h2>Welcome to the Admin Panel</h2>
 
-          <!-- Admin: Registered users list -->
-          <div id="adminUsersSection">
-            <h3>Registered Users</h3>
-            <div id="noUsersMsg" style="display:none; color:#666;">No user registrations found.</div>
-            <table id="usersTable" class="users-table" style="width:100%; border-collapse:collapse; display:none;">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Role</th>
-                </tr>
-              </thead>
-              <tbody id="usersTableBody"></tbody>
-            </table>
+          <h3>Registered Users</h3>
+          <div id="noUsersMsg" style="display: none; color: #666">
+            No users found
           </div>
 
-          <!-- Admin: Action logs -->
-          <div id="adminLogsSection" style="margin-top:12px">
-            <h3>Activity Logs</h3>
-            <div id="noLogsMsg" style="display:none; color:#666;">No logs yet.</div>
-            <table id="logsTable" class="users-table logs-table" style="width:100%; border-collapse:collapse; display:none;">
-              <thead>
-                <tr>
-                  <th>Type</th>
-                  <th>Email</th>
-                  <th>Timestamp</th>
-                </tr>
-              </thead>
-              <tbody id="logsTableBody"></tbody>
-            </table>
+          <table id="usersTable" class="users-table" style="display: none">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody"></tbody>
+          </table>
+
+          <h3 style="margin-top: 16px">Activity Logs</h3>
+          <div id="noLogsMsg" style="display: none; color: #666">
+            No logs yet
           </div>
 
+          <table id="logsTable" class="users-table" style="display: none">
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Email</th>
+                <th>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody id="logsTableBody"></tbody>
+          </table>
         </div>
 
-        <!-- user app -->
+        <!-- USER -->
         <div id="userApp" style="display: none">
           <nav>
-            <button class="btn" id="logoutBtn" onclick="logout()">
-              Logout
-            </button>
+            <button class="btn logoutBtn" onclick="logout()">Logout</button>
           </nav>
+
           <h2>Welcome to the User Panel</h2>
-          <!-- Main app UI goes here -->
-            <!-- Profile (read-only) -->
-        <div id="profileCard" class="profile-card" style="display:none; border:1px solid #ccc; padding:12px; margin-bottom:12px;">
+
+          <div id="profileCard" class="profile-card" style="display: none">
             <h3>Your Profile</h3>
             <p><strong>Name:</strong> <span id="profileName"></span></p>
             <p><strong>Email:</strong> <span id="profileEmail"></span></p>
             <p><strong>Role:</strong> <span id="profileRole"></span></p>
-            <p id="noProfileMsg" style="display:none; color:#a00;">No user is logged in.</p>
-        </div>
+            <p id="noProfileMsg" style="display: none; color: #a00">
+              No user logged in
+            </p>
+            <hr style="margin: 12px 0" />
+
+            <label style="display: flex; align-items: center; gap: 8px">
+              <input type="checkbox" id="toggle2FA" />
+              Enable Two-Factor Authentication (2FA)
+            </label>
+
+            <div id="disable2FABox" style="display: none; margin-top: 8px">
+              <input
+                type="password"
+                id="confirmPassword"
+                placeholder="Confirm password to disable 2FA"
+              />
+              <button class="btn" onclick="disable2FA()">
+                Confirm Disable
+              </button>
+              <p id="disable2FAError" style="color: red; font-size: 14px"></p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
+
     <script src="script.js"></script>
   </body>
 </html>

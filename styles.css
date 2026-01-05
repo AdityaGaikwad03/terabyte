@@ -1,0 +1,165 @@
+/* Shared site styles */
+:root {
+  --bg: #f4f6f8;
+  --card: #ffffff;
+  --accent: #2563eb;
+  --accent-dark: #1e40af;
+  --muted: #6b7280;
+  --radius: 10px;
+  --shadow: 0 6px 20px rgba(3, 7, 18, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial;
+}
+html,
+body {
+  height: 100%;
+  margin: 0;
+  background: var(--bg);
+  color: #111;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 36px auto;
+  padding: 20px;
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.brand .logo {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+}
+.title {
+  font-size: 20px;
+  font-weight: 700;
+}
+.tagline {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.nav {
+  display: flex;
+  gap: 10px;
+}
+.nav a {
+  padding: 8px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--accent);
+  border: 1px solid rgba(37, 99, 235, 0.12);
+}
+
+.footer {
+  margin-top: 28px;
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+.dashboard {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.card {
+  background: var(--card);
+  padding: 22px;
+  border-radius: var(--radius);
+  width: 260px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(3, 7, 18, 0.12);
+}
+.card h3 {
+  margin: 0 0 8px;
+  color: #0f172a;
+}
+.card p {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 14px;
+}
+.card .btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 12px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
+  font-weight: 600;
+}
+.card .btn:hover {
+  background: var(--accent-dark);
+}
+
+/* global button helper */
+.btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.btn:hover {
+  background: var(--accent-dark);
+}
+
+/* page header for student pages */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.back-btn {
+  background: transparent;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: #111;
+  text-decoration: none;
+}
+
+/* responsive */
+@media (max-width: 768px) {
+  .card {
+    width: 45%;
+  }
+}
+@media (max-width: 480px) {
+  .card {
+    width: 100%;
+    max-width: 360px;
+  }
+}

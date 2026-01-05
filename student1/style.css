@@ -1,181 +1,235 @@
-*{
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
+/* ===== RESET & BASE ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
 }
 
-body{
-    background: #f0f2f5;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    width: 100%;
-    padding: 20px;
-} 
-
-.container{
-    background: #fff;
-    padding: 24px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    width: 100%;
-    max-width: 420px;
-} 
-
-h2{
-    text-align: center;
-    margin-bottom: 20px;
-    color: #333;
+body {
+  background: #f0f2f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  padding: 20px;
 }
 
-form{
-    display: flex;
-    flex-direction: column;
+/* ===== CONTAINER ===== */
+.container {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 420px;
 }
 
-input[type="text"], input[type="password"], input[type="email"]{
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+/* ===== HEADINGS ===== */
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
 }
 
-label{
-    margin-bottom: 5px;
-    color: #555;
+h3 {
+  margin: 10px 0;
+  color: #333;
 }
 
-.btn{
-    color: white;
-    background: rgb(89, 89, 255);
-    padding: 8px 14px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    display: inline-block;
-    font-weight: 600;
-} 
-
-.text{
-    padding: 3px;
-    margin-top: 10px;
+/* ===== FORMS ===== */
+form {
+  display: flex;
+  flex-direction: column;
 }
 
-.role{
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 15px;
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
-#registrationSection{
-    display: none;
+input:focus {
+  outline: none;
+  border-color: #5959ff;
 }
 
-#error, #regError{
-    color: red;
-    margin-top: 10px;
-    text-align: center;
+/* ===== BUTTONS ===== */
+.btn {
+  color: #fff;
+  background: rgb(89, 89, 255);
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s, transform 0.1s;
 }
 
-#appSection{
-    text-align: center;
-}
-nav{
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 20px;
-}
-nav .btn{
-    width: auto;
-    padding: 5px 15px;
-}
-nav .btn:hover{
-    background: rgb(70, 70, 255);
-    cursor: pointer;
-}
-nav .btn:active{
-    transform: scale(0.98);
-}
-nav .btn:focus{
-    outline: none;
-}
-nav .btn{
-    transition: background 0.3s;
-}
-nav .btn{
-    transition: transform 0.1s;
-}
-#logoutBtn{
-    background: rgb(255, 89, 89);
-    border: 2px solid red;
-}
-#logoutBtn:hover{
-    background: rgb(255, 70, 70);
-    cursor: pointer;
-}
-#logoutBtn:active{
-    transform: scale(0.98);
-}
-#logoutBtn:focus{
-    outline: none;
-}
-#logoutBtn{
-    transition: background 0.3s;
-}
-#logoutBtn{
-    transition: transform 0.1s;
+.btn:hover {
+  background: rgb(70, 70, 255);
 }
 
-/* Profile card styles */
-.profile-card{
-    text-align: left;
-    background: #fbfcff;
-    border-radius: 6px;
-}
-.profile-card h3{
-    margin-bottom: 8px;
-    color: #333;
-}
-.profile-card p{
-    margin: 6px 0;
-    color: #444;
+.btn:active {
+  transform: scale(0.98);
 }
 
-/* Users table */
+/* Logout button */
+.logoutBtn {
+  background: rgb(255, 89, 89);
+}
+
+.logoutBtn:hover {
+  background: rgb(255, 70, 70);
+}
+
+/* ===== TEXT / LINKS ===== */
+.text {
+  margin-top: 10px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.text a {
+  color: #5959ff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.text a:hover {
+  text-decoration: underline;
+}
+
+/* ===== ROLE SELECT ===== */
+.role {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+  font-size: 14px;
+  gap: 15px;
+}
+
+/* ===== ERROR MESSAGES ===== */
+#loginError,
+#regError,
+#otpError {
+  color: red;
+  margin-top: 8px;
+  text-align: center;
+  font-size: 14px;
+}
+
+/* ===== NAV ===== */
+nav {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 15px;
+}
+
+/* ===== PROFILE CARD ===== */
+.profile-card {
+  text-align: left;
+  background: #fbfcff;
+  border-radius: 6px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.profile-card h3 {
+  margin-bottom: 8px;
+}
+
+.profile-card p {
+  margin: 6px 0;
+  color: #444;
+}
+
+/* ===== TABLES (ADMIN) ===== */
 .users-table {
   width: 100%;
-  border: 1px solid #e0e0e0;
   border-collapse: collapse;
   margin-top: 10px;
-  table-layout: auto;
 }
-.users-table th, .users-table td {
+
+.users-table th,
+.users-table td {
   padding: 8px;
   border: 1px solid #eaeaea;
   text-align: left;
+  font-size: 14px;
 }
+
 .users-table thead th {
   background: #f6f7fb;
   font-weight: 600;
 }
+
 .users-table tbody tr:nth-child(even) {
   background: #fbfbfb;
 }
 
-/* helper to allow horizontal scroll on small screens */
-.table-responsive{overflow-x:auto}
-
-
-/* Responsive adjustments */
-@media (max-width: 480px) {
-  .container{max-width:100%; padding:16px}
-  .role{flex-direction:column; align-items:flex-start; gap:6px}
-  nav{margin-bottom:12px}
-  .users-table th, .users-table td{padding:8px; font-size:0.92rem}
-  .profile-card{padding:10px}
-  .btn{width:100%; padding:10px}
+/* ===== OTP (2FA) ===== */
+#otpSection {
+  text-align: center;
 }
 
+#otpDisplay {
+  font-size: 18px;
+  font-weight: 700;
+  color: #2563eb;
+  margin-bottom: 12px;
+}
+
+#otpInput {
+  text-align: center;
+  letter-spacing: 4px;
+  font-size: 16px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 480px) {
+  .container {
+    max-width: 100%;
+    padding: 16px;
+  }
+
+  .role {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  nav {
+    margin-bottom: 10px;
+  }
+
+  .users-table th,
+  .users-table td {
+    font-size: 13px;
+  }
+
+  .btn {
+    width: 100%;
+    padding: 10px;
+  }
+}
+
+.progress-container {
+  width: 100%;
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 6px;
+  margin: 8px 0;
+  overflow: hidden;
+}
+
+#otpProgress {
+  height: 100%;
+  width: 100%;
+  background: #2563eb;
+  transition: width 1s linear;
+}

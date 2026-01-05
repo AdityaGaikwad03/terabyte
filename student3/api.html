@@ -3,25 +3,32 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="style.css" />
+    <title>API Playground</title>
   </head>
   <body>
+    <div class="container">
+      <header class="page-header">
+        <a class="back-btn" href="../index.html">← Home</a>
+        <div style="flex:1"></div>
+      </header>
     <section id="feature13">
-      <button id="fetchPromisesBtn">Fetch Data (Promises)</button>
+      <button id="fetchPromisesBtn" class="btn">Fetch Data (Promises)</button>
       <div id="loadingPromises" style="display: none">Loading...</div>
       <ul id="dataPromises"></ul>
       <div id="errorPromises" style="color: crimson; margin-top: 6px"></div>
     </section>
 
     <section id="feature14" style="margin-top: 18px">
-      <button id="fetchAsyncBtn">Fetch Data (Async/Await)</button>
+      <button id="fetchAsyncBtn" class="btn">Fetch Data (Async/Await)</button>
       <div id="loadingAsync" style="display: none">Loading...</div>
       <ul id="dataAsync"></ul>
       <div id="errorAsync" style="color: crimson; margin-top: 6px"></div>
     </section>
 
     <section id="feature15" style="margin-top: 18px">
-      <button id="loadParallelBtn">Load Data (Parallel)</button>
+      <button id="loadParallelBtn" class="btn">Load Data (Parallel)</button>
       <div id="loadingParallel" style="display: none">Loading...</div>
       <ul id="dataParallel"></ul>
       <div id="errorParallel" style="color: crimson; margin-top: 6px"></div>
@@ -33,7 +40,18 @@
       <button id="message" style="display: none">send message</button>
     </section>
 
+    <section>
+      <ul id="delegationList"></ul>
+    </section>
+
+    <section id="feature18" style="margin-top: 20px">
+      <button id="refreshBtn" class="btn">Refresh Data</button>
+      <div id="loadingCache" style="display: none">Loading...</div>
+      <ul id="cacheData"></ul>
+      <div id="cacheError" style="color: crimson; margin-top: 6px"></div>
+    </section>
+    </div>
+
     <script src="script.js"></script>
   </body>
 </html>
-

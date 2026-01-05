@@ -1,120 +1,175 @@
-function renderList(ulElement, items, mapper) {
-  ulElement.innerHTML = '';
+/********************************
+ * HELPER: RENDER LIST
+ ********************************/
+function renderList(ul, items, mapper) {
+  ul.innerHTML = "";
   items.forEach(item => {
-    const li = document.createElement('li');
-    li.innerText = mapper ? mapper(item) : JSON.stringify(item);
-    ulElement.appendChild(li);
+    const li = document.createElement("li");
+    li.innerText = mapper ? mapper(item) : item;
+    ul.appendChild(li);
   });
 }
 
+/********************************
+ * FEATURE 13: FETCH WITH PROMISES
+ ********************************/
+const fetchPromisesBtn = document.getElementById("fetchPromisesBtn");
+const loadingPromises = document.getElementById("loadingPromises");
+const dataPromises = document.getElementById("dataPromises");
+const errorPromises = document.getElementById("errorPromises");
 
-const fetchPromisesBtn = document.getElementById('fetchPromisesBtn');
-const loadingPromises = document.getElementById('loadingPromises');
-const dataPromises = document.getElementById('dataPromises');
-const errorPromises = document.getElementById('errorPromises');
-
-function fetchWithPromises() {
-  const url = 'https://jsonplaceholder.typicode.com/users';
+fetchPromisesBtn.addEventListener("click", () => {
   fetchPromisesBtn.disabled = true;
-  loadingPromises.style.display = 'block';
-  dataPromises.innerHTML = '';
-  errorPromises.innerText = '';
+  loadingPromises.style.display = "block";
+  dataPromises.innerHTML = "";
+  errorPromises.innerText = "";
 
-  fetch(url)
-    .then(response => {
-      if (!response.ok) throw new Error('Network response was not ok');
-      return response.json();
+  fetch("https://jsonplaceholder.typicode.com/users")
+    .then(res => {
+      if (!res.ok) throw new Error("Network error");
+      return res.json();
     })
     .then(data => {
-      renderList(dataPromises, data, u => `Name: ${u.name} | Email: ${u.email}`);
+      renderList(dataPromises, data, u => `${u.name} | ${u.email}`);
     })
     .catch(err => {
-      console.error('Fetch (Promises) error:', err);
-      errorPromises.innerText = 'Error: ' + err.message;
+      errorPromises.innerText = err.message;
     })
     .finally(() => {
-      loadingPromises.style.display = 'none';
+      loadingPromises.style.display = "none";
       fetchPromisesBtn.disabled = false;
     });
-}
+});
 
-fetchPromisesBtn.addEventListener('click', fetchWithPromises);
+/********************************
+ * FEATURE 14 + 18: ASYNC + CACHE
+ ********************************/
+const fetchAsyncBtn = document.getElementById("fetchAsyncBtn");
+const refreshBtn = document.getElementById("refreshBtn");
 
+const loadingAsync = document.getElementById("loadingAsync");
+const dataAsync = document.getElementById("dataAsync");
+const errorAsync = document.getElementById("errorAsync");
 
-const fetchAsyncBtn = document.getElementById('fetchAsyncBtn');
-const loadingAsync = document.getElementById('loadingAsync');
-const dataAsync = document.getElementById('dataAsync');
-const errorAsync = document.getElementById('errorAsync');
+const CACHE_KEY = "myData";
+const API_URL = "https://jsonplaceholder.typicode.com/users";
 
-async function fetchDataAsync() {
-  const url = 'https://jsonplaceholder.typicode.com/users';
-  fetchAsyncBtn.disabled = true;
-  loadingAsync.style.display = 'block';
-  dataAsync.innerHTML = '';
-  errorAsync.innerText = '';
+async function loadUsers(forceRefresh = false) {
+  loadingAsync.style.display = "block";
+  dataAsync.innerHTML = "";
+  errorAsync.innerText = "";
+
   try {
-    const response = await fetch(url);
-    if (!response.ok) throw new Error('Network response was not ok');
-    const data = await response.json();
-    renderList(dataAsync, data, u => `Name: ${u.name} | Email: ${u.email}`);
+    // Load from cache on page load
+    if (!forceRefresh) {
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (cached) {
+        renderList(dataAsync, JSON.parse(cached), u => u.name);
+        return;
+      }
+    }
+
+    // Fetch fresh data
+    const res = await fetch(API_URL);
+    if (!res.ok) throw new Error("Failed to fetch data");
+
+    const data = await res.json();
+    localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+    renderList(dataAsync, data, u => u.name);
+
   } catch (err) {
-    console.error('Fetch (Async) error:', err);
-    errorAsync.innerText = 'Error: ' + err.message;
+    errorAsync.innerText = err.message;
   } finally {
-    loadingAsync.style.display = 'none';
-    fetchAsyncBtn.disabled = false;
+    loadingAsync.style.display = "none";
   }
 }
 
-fetchAsyncBtn.addEventListener('click', fetchDataAsync);
+fetchAsyncBtn.addEventListener("click", () => loadUsers(false));
+refreshBtn.addEventListener("click", () => loadUsers(true));
+window.addEventListener("load", () => loadUsers(false));
 
+/********************************
+ * FEATURE 15: PARALLEL API CALLS
+ ********************************/
+const loadParallelBtn = document.getElementById("loadParallelBtn");
+const loadingParallel = document.getElementById("loadingParallel");
+const dataParallel = document.getElementById("dataParallel");
+const errorParallel = document.getElementById("errorParallel");
 
-const loadParallelBtn = document.getElementById('loadParallelBtn');
-const loadingParallel = document.getElementById('loadingParallel');
-const dataParallel = document.getElementById('dataParallel');
-const errorParallel = document.getElementById('errorParallel');
-
-function loadParallelData() {
-  const url1 = 'https://jsonplaceholder.typicode.com/users';
-  const url2 = 'https://jsonplaceholder.typicode.com/posts';
-  loadParallelBtn.disabled = true;
-  loadingParallel.style.display = 'block';
-  dataParallel.innerHTML = '';
-  errorParallel.innerText = '';
+loadParallelBtn.addEventListener("click", () => {
+  loadingParallel.style.display = "block";
+  dataParallel.innerHTML = "";
+  errorParallel.innerText = "";
 
   Promise.all([
-    fetch(url1).then(r => { if (!r.ok) throw new Error('Users fetch failed'); return r.json(); }),
-    fetch(url2).then(r => { if (!r.ok) throw new Error('Posts fetch failed'); return r.json(); })
+    fetch("https://jsonplaceholder.typicode.com/users").then(r => r.json()),
+    fetch("https://jsonplaceholder.typicode.com/posts").then(r => r.json())
   ])
     .then(([users, posts]) => {
-      
-      const combined = [];
-      users.slice(0,5).forEach(u => combined.push({type:'user', text:`User: ${u.name} | ${u.email}`}));
-      posts.slice(0,5).forEach(p => combined.push({type:'post', text:`Post: ${p.title}`}));
-      renderList(dataParallel, combined, item => item.text);
+      const combined = [
+        ...users.slice(0, 5).map(u => `User: ${u.name}`),
+        ...posts.slice(0, 5).map(p => `Post: ${p.title}`)
+      ];
+      renderList(dataParallel, combined);
     })
-    .catch(err => {
-      console.error('Parallel fetch error:', err);
-      errorParallel.innerText = 'Error: ' + err.message;
+    .catch(() => {
+      errorParallel.innerText = "Failed to load parallel data";
     })
     .finally(() => {
-      loadingParallel.style.display = 'none';
-      loadParallelBtn.disabled = false;
+      loadingParallel.style.display = "none";
     });
-}
+});
 
-loadParallelBtn.addEventListener('click', loadParallelData);
+/********************************
+ * FEATURE 16: CONTEXT-AWARE INPUT
+ ********************************/
+const input = document.getElementById("input");
+const pay = document.getElementById("pay");
+const message = document.getElementById("message");
 
+input.addEventListener("input", () => {
+  const value = input.value.trim();
+  pay.style.display = "none";
+  message.style.display = "none";
 
+  if (!value) return;
 
+  const isNumber = /^\d+$/.test(value);
+  const num = Number(value);
 
-function switch_btn() {
-    const send_message = document.getElementById("message")
-    const pay = document.getElementById("pay");
-    const input = document.getElementById("input");
-    if(pay.value === integer) {
-      pay.style.display = "block";
-    } else {
-        send_message.style.display = "block";
-    }
-}
+  if (isNumber && num >= 1 && num <= 100000) {
+    pay.style.display = "inline-block";
+  } else {
+    message.style.display = "inline-block";
+  }
+});
+
+/********************************
+ * FEATURE 17: EVENT DELEGATION
+ ********************************/
+const delegationList = document.getElementById("delegationList");
+
+const delegatedItems = [
+  { id: 1, name: "Item One" },
+  { id: 2, name: "Item Two" },
+  { id: 3, name: "Item Three" }
+];
+
+delegatedItems.forEach(item => {
+  const li = document.createElement("li");
+  li.className = "delegated-item";
+  li.dataset.id = item.id;
+  li.innerText = item.name;
+  delegationList.appendChild(li);
+});
+
+delegationList.addEventListener("click", e => {
+  const li = e.target.closest(".delegated-item");
+  if (!li) return;
+
+  document
+    .querySelectorAll(".delegated-item")
+    .forEach(el => el.classList.remove("active"));
+
+  li.classList.add("active");
+});

@@ -1,6 +1,8 @@
 const searchInput = document.getElementById("search-input");
 const itemList = document.getElementById("item-list");
+const statusText = document.getElementById("status");
 
+/* ---------- DATA ---------- */
 const originalItems = [
   { id: 1, name: "Cricket" },
   { id: 2, name: "Ball" },
@@ -9,10 +11,9 @@ const originalItems = [
   { id: 5, name: "Stumps" }
 ];
 
-let items = [...originalItems];
-let sortOrder = null; 
+let sortOrder = null;
 
-// Feature 7: Smart Subsequence Search
+/* ---------- FEATURE 7: SUBSEQUENCE SEARCH ---------- */
 function isSubsequence(search, text) {
   let i = 0;
   for (let char of text) {
@@ -22,71 +23,85 @@ function isSubsequence(search, text) {
   return search.length === 0;
 }
 
-// Feature 8: Search-As-You-Type with Debouncing
-function debounce(func, delay) {
-  let timeoutId;
-  return function (...args) {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => func.apply(this, args), delay);
+/* ---------- FEATURE 8: DEBOUNCE ---------- */
+function debounce(fn, delay) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), delay);
   };
 }
 
+/* ---------- FEATURE 11: FILTER → SORT → RENDER ---------- */
+function applyFilterAndSort() {
+  const searchValue = searchInput.value.toLowerCase();
 
-// Feature 9: Dynamic Data List Rendering
-function renderList(data) {
+  // 1️⃣ FILTER FIRST
+  let result = originalItems.filter(item =>
+    isSubsequence(searchValue, item.name.toLowerCase())
+  );
+
+  // 2️⃣ SORT FILTERED RESULT
+  if (sortOrder === "asc") {
+    result.sort((a, b) => a.name.localeCompare(b.name));
+  } else if (sortOrder === "desc") {
+    result.sort((a, b) => b.name.localeCompare(a.name));
+  }
+
+  // 3️⃣ UPDATE UI
+  updateStatus(searchValue, sortOrder);
+  renderList(result);
+}
+
+/* ---------- RENDER ---------- */
+function renderList(items) {
   itemList.innerHTML = "";
 
-  data.forEach(item => {
+  if (items.length === 0) {
+    itemList.innerHTML = "<li>No results found</li>";
+    return;
+  }
+
+  items.forEach(item => {
     const li = document.createElement("li");
     li.textContent = item.name;
     itemList.appendChild(li);
   });
 }
 
-function filterItems() {
-  const searchValue = searchInput.value.toLowerCase();
+/* ---------- UI STATUS ---------- */
+function updateStatus(filter, sort) {
+  let msg = filter ? `Filter: "${filter}"` : "Filter: none";
+  msg += " | ";
+  msg += sort === "asc" ? "Sort: A–Z"
+       : sort === "desc" ? "Sort: Z–A"
+       : "Sort: none";
 
-  let filteredItems = originalItems.filter(item =>
-    isSubsequence(searchValue, item.name.toLowerCase())
-  );
-
-
-  if (sortOrder === "asc") {
-    filteredItems.sort((a, b) => a.name.localeCompare(b.name));
-  } else if (sortOrder === "desc") {
-    filteredItems.sort((a, b) => b.name.localeCompare(a.name));
-  }
-
-  items = filteredItems;
-  renderList(items);
+  statusText.innerText = msg;
 }
 
+/* ---------- EVENTS ---------- */
+const debouncedUpdate = debounce(applyFilterAndSort, 300);
+searchInput.addEventListener("input", debouncedUpdate);
 
-
-const debouncedFilterItems = debounce(filterItems, 300);
-searchInput.addEventListener("input", debouncedFilterItems);
-
-//  Feature 10: Sorting with Toggle State
 function ascending() {
   sortOrder = "asc";
-  filterItems();
+  applyFilterAndSort();
 }
 
 function descending() {
   sortOrder = "desc";
-  filterItems();
+  applyFilterAndSort();
 }
 
-//  Feature 12: Clear All Filters 
+/* ---------- FEATURE 12: CLEAR FILTERS ---------- */
 function clearFilters() {
   searchInput.value = "";
   sortOrder = null;
-  items = [...originalItems];
-  renderList(items);
+  updateStatus("", null);
+  renderList(originalItems);
 }
 
-
-renderList(items);
-
-
-
+/* ---------- INIT ---------- */
+renderList(originalItems);
+updateStatus("", null);
