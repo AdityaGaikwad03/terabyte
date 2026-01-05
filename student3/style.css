@@ -1,0 +1,92 @@
+/* Basic styles only */
+
+body {
+  margin: 0;
+  padding: 16px;
+  background: #f5f5f5;
+  color: #222;
+}
+
+.wrap {
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+h1 {
+  font-size: 22px;
+  margin: 0 0 12px 0;
+}
+
+.panel {
+  background: #ffffff;
+  border: 1px solid #ddd;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.row { margin-bottom: 10px; }
+
+label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+input[type="text"],
+input[type="search"],
+textarea {
+  width: 100%;
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.actions { display: flex; gap: 8px; }
+
+button {
+  padding: 8px 12px;
+  border: 1px solid #bbb;
+  background: #eee;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button#submit-btn {
+  background: #0077cc;
+  color: #fff;
+  border-color: #0077cc;
+}
+
+.hidden { display: none; }
+
+.error {
+  color: #b00020;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+
+
+
+
+/* Card */
+.note {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 10px;
+}
+
+.note h3 {
+  margin: 0 0 6px 0;
+  font-size: 16px;
+}
+
+.note p {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+}
+
+.note .note-actions { display: flex; gap: 6px; }
