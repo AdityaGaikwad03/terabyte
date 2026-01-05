@@ -55,12 +55,14 @@ const CACHE_KEY = "myData";
 const API_URL = "https://jsonplaceholder.typicode.com/users";
 
 async function loadUsers(forceRefresh = false) {
-  loadingAsync.style.display = "block";
+  // Prevent concurrent loads
+  if (loadUsers._loading) return;
+
   dataAsync.innerHTML = "";
   errorAsync.innerText = "";
 
   try {
-    // Load from cache on page load
+    // Use cache unless forced to refresh
     if (!forceRefresh) {
       const cached = localStorage.getItem(CACHE_KEY);
       if (cached) {
@@ -68,6 +70,12 @@ async function loadUsers(forceRefresh = false) {
         return;
       }
     }
+
+    // Show loading UI and mark as loading
+    loadUsers._loading = true;
+    loadingAsync.style.display = "block";
+    fetchAsyncBtn.disabled = true;
+    refreshBtn.disabled = true;
 
     // Fetch fresh data
     const res = await fetch(API_URL);
@@ -81,12 +89,16 @@ async function loadUsers(forceRefresh = false) {
     errorAsync.innerText = err.message;
   } finally {
     loadingAsync.style.display = "none";
+    fetchAsyncBtn.disabled = false;
+    refreshBtn.disabled = false;
+    loadUsers._loading = false;
   }
 }
 
 fetchAsyncBtn.addEventListener("click", () => loadUsers(false));
 refreshBtn.addEventListener("click", () => loadUsers(true));
-window.addEventListener("load", () => loadUsers(false));
+// Do not auto-load on page load — load only when user clicks the button
+// window.addEventListener("load", () => loadUsers(false));
 
 /********************************
  * FEATURE 15: PARALLEL API CALLS
